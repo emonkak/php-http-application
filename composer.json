@@ -1,0 +1,34 @@
+{
+    "name": "emonkak/http-middleware",
+    "description": "A library for web framework building that uses HTTP Middleware",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Shota Nozaki",
+            "email": "emonkak@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5",
+        "container-interop/container-interop": "^1.1",
+        "emonkak/http-exception": "^1.0",
+        "emonkak/router": "^0.1.0",
+        "http-interop/http-middleware": "^0.3.0",
+        "psr/http-message": "^1.0",
+        "psr/log": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.4",
+        "satooshi/php-coveralls": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Emonkak\\HttpMiddleware\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Emonkak\\HttpMiddleware\\Tests\\": "tests/"
+        }
+    }
+}
