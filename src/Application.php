@@ -6,11 +6,12 @@ use Emonkak\HttpException\HttpExceptionInterface;
 use Emonkak\HttpException\InternalServerErrorHttpException;
 use Emonkak\HttpMiddleware\Internal\ErrorPipeline;
 use Emonkak\HttpMiddleware\Internal\Pipeline;
-use Interop\Http\Middleware\ServerMiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-class Application
+class Application implements ErrorHandlerInterface, RequestHandlerInterface
 {
     /**
      * @var \SplQueue
@@ -32,12 +33,12 @@ class Application
      * @param ServerRequestInterface $request
      * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $request)
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $pipeline = new Pipeline(clone $this->middlewares);
 
         try {
-            return $pipeline->process($request);
+            return $pipeline->handle($request);
         } catch (HttpExceptionInterface $e) {
             return $this->handleError($request, $e);
         } catch (\Exception $e) {
@@ -50,18 +51,18 @@ class Application
      * @param HttpExceptionInterface $exception
      * @return ResponseInterface
      */
-    public function handleError(ServerRequestInterface $request, HttpExceptionInterface $exception)
+    public function handleError(ServerRequestInterface $request, HttpExceptionInterface $exception): ResponseInterface
     {
         $pipeline = new ErrorPipeline(clone $this->errorMiddlewares);
 
-        return $pipeline->processError($request, $exception);
+        return $pipeline->handleError($request, $exception);
     }
 
     /**
-     * @param ServerMiddlewareInterface $middleware
+     * @param MiddlewareInterface $middleware
      * @return $this
      */
-    public function pipe(ServerMiddlewareInterface $middleware)
+    public function pipe(MiddlewareInterface $middleware): Application
     {
         $this->middlewares->enqueue($middleware);
 
@@ -69,21 +70,21 @@ class Application
     }
 
     /**
-     * @param ServerMiddlewareInterface $middleware
-     * @param callable                  $predicate
+     * @param MiddlewareInterface $middleware
+     * @param callable            $predicate
      * @return $this
      */
-    public function pipeIf(ServerMiddlewareInterface $middleware, callable $predicate)
+    public function pipeIf(MiddlewareInterface $middleware, callable $predicate): Application
     {
         return $this->pipe(new PredicateDecorator($middleware, $predicate));
     }
 
     /**
-     * @param ServerMiddlewareInterface $middleware
-     * @param string                    $path
+     * @param MiddlewareInterface $middleware
+     * @param string              $path
      * @return $this
      */
-    public function pipeOn(ServerMiddlewareInterface $middleware, $path)
+    public function pipeOn(MiddlewareInterface $middleware, $path): Application
     {
         return $this->pipeIf($middleware, static function(ServerRequestInterface $request) use ($path) {
             return strpos($request->getUri()->getPath(), $path) === 0;
@@ -91,10 +92,10 @@ class Application
     }
 
     /**
-     * @param ServerMiddlewareInterface $middleware
+     * @param MiddlewareInterface $middleware
      * @return $this
      */
-    public function pipeOnError(ErrorMiddlewareInterface $errorMiddleware)
+    public function pipeOnError(ErrorMiddlewareInterface $errorMiddleware): Application
     {
         $this->errorMiddlewares->enqueue($errorMiddleware);
 

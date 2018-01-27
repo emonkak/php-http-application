@@ -8,22 +8,23 @@ use Emonkak\HttpMiddleware\Application;
 use Emonkak\HttpMiddleware\ErrorMiddlewareInterface;
 use Emonkak\HttpMiddleware\Internal\ErrorPipeline;
 use Emonkak\HttpMiddleware\Internal\Pipeline;
-use Interop\Http\Middleware\ServerMiddlewareInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
+use Psr\Http\Server\MiddlewareInterface;
 
 /**
  * @covers Emonkak\HttpMiddleware\Application
  */
-class ApplicationTest extends \PHPUnit_Framework_TestCase
+class ApplicationTest extends TestCase
 {
     public function testPipe()
     {
-        $request = $this->getMock(ServerRequestInterface::class);
-        $response = $this->getMock(ResponseInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        $middleware = $this->getMock(ServerMiddlewareInterface::class);
+        $middleware = $this->createMock(MiddlewareInterface::class);
         $middleware
             ->expects($this->once())
             ->method('process')
@@ -39,15 +40,15 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     public function testPipeIf()
     {
-        $request = $this->getMock(ServerRequestInterface::class);
-        $response = $this->getMock(ResponseInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        $falseMiddleware = $this->getMock(ServerMiddlewareInterface::class);
+        $falseMiddleware = $this->createMock(MiddlewareInterface::class);
         $falseMiddleware
             ->expects($this->never())
             ->method('process');
 
-        $trueMiddleware = $this->getMock(ServerMiddlewareInterface::class);
+        $trueMiddleware = $this->createMock(MiddlewareInterface::class);
         $trueMiddleware
             ->expects($this->once())
             ->method('process')
@@ -69,14 +70,14 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testPipeOn()
     {
         $request = $this->createMockRequest('GET', '/bar/123');
-        $response = $this->getMock(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        $fooMiddleware = $this->getMock(ServerMiddlewareInterface::class);
+        $fooMiddleware = $this->createMock(MiddlewareInterface::class);
         $fooMiddleware
             ->expects($this->never())
             ->method('process');
 
-        $barMiddleware = $this->getMock(ServerMiddlewareInterface::class);
+        $barMiddleware = $this->createMock(MiddlewareInterface::class);
         $barMiddleware
             ->expects($this->once())
             ->method('process')
@@ -94,11 +95,11 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testPipeOnHttpException()
     {
         $request = $this->createMockRequest('GET', '/bar/123');
-        $response = $this->getMock(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
         $exception = new HttpException(500);
 
-        $middleware = $this->getMock(ServerMiddlewareInterface::class);
+        $middleware = $this->createMock(MiddlewareInterface::class);
         $middleware
             ->expects($this->once())
             ->method('process')
@@ -108,7 +109,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->throwException($exception));
 
-        $errorMiddleware = $this->getMock(ErrorMiddlewareInterface::class);
+        $errorMiddleware = $this->createMock(ErrorMiddlewareInterface::class);
         $errorMiddleware
             ->expects($this->once())
             ->method('processError')
@@ -130,11 +131,11 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testPipeOnGenericException()
     {
         $request = $this->createMockRequest('GET', '/bar/123');
-        $response = $this->getMock(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
         $exception = new \Exception();
 
-        $middleware = $this->getMock(ServerMiddlewareInterface::class);
+        $middleware = $this->createMock(MiddlewareInterface::class);
         $middleware
             ->expects($this->once())
             ->method('process')
@@ -144,7 +145,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->throwException($exception));
 
-        $errorMiddleware = $this->getMock(ErrorMiddlewareInterface::class);
+        $errorMiddleware = $this->createMock(ErrorMiddlewareInterface::class);
         $errorMiddleware
             ->expects($this->once())
             ->method('processError')
@@ -165,13 +166,13 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     private function createMockRequest($method, $path)
     {
-        $uri = $this->getMock(UriInterface::class);
+        $uri = $this->createMock(UriInterface::class);
         $uri
             ->expects($this->any())
             ->method('getPath')
             ->willReturn($path);
 
-        $request = $this->getMock(ServerRequestInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
         $request
             ->expects($this->any())
             ->method('getMethod')

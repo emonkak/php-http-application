@@ -3,8 +3,9 @@
 namespace Emonkak\HttpMiddleware\Tests;
 
 use Emonkak\HttpException\HttpExceptionInterface;
-use Emonkak\HttpMiddleware\ErrorDelegateInterface;
+use Emonkak\HttpMiddleware\ErrorHandlerInterface;
 use Emonkak\HttpMiddleware\ErrorLogger;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LogLevel;
@@ -13,29 +14,29 @@ use Psr\Log\LoggerInterface;
 /**
  * @covers Emonkak\HttpMiddleware\ErrorLogger
  */
-class ErrorLoggerTest extends \PHPUnit_Framework_TestCase
+class ErrorLoggerTest extends TestCase
 {
     /**
-     * @dataProvider providerHandleError
+     * @dataProvider providerProcessError
      */
-    public function testHandleError($statusCode, $expectedLogLevel)
+    public function testProcessError($statusCode, $expectedLogLevel)
     {
-        $request = $this->getMock(ServerRequestInterface::class);
-        $response = $this->getMock(ResponseInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        $exception = $this->getMock(HttpExceptionInterface::class);
+        $exception = $this->createMock(HttpExceptionInterface::class);
         $exception
             ->expects($this->once())
             ->method('getStatusCode')
             ->willReturn($statusCode);
 
-        $delegate = $this->getMock(ErrorDelegateInterface::class);
-        $delegate
+        $handler = $this->createMock(ErrorHandlerInterface::class);
+        $handler
             ->expects($this->once())
-            ->method('processError')
+            ->method('handleError')
             ->willReturn($response);
 
-        $logger = $this->getMock(LoggerInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
         $logger
             ->expects($this->once())
             ->method('log')
@@ -47,10 +48,10 @@ class ErrorLoggerTest extends \PHPUnit_Framework_TestCase
 
         $errorLogger = new ErrorLogger($logger);
 
-        $this->assertSame($response, $errorLogger->processError($request, $exception, $delegate));
+        $this->assertSame($response, $errorLogger->processError($request, $exception, $handler));
     }
 
-    public function providerHandleError()
+    public function providerProcessError()
     {
         return [
             [301, LogLevel::INFO],

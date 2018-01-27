@@ -4,44 +4,44 @@ namespace Emonkak\HttpMiddleware\Tests\Middleware;
 
 use Emonkak\HttpMiddleware\Dispatcher;
 use Emonkak\Router\RouterInterface;
-use Interop\Container\ContainerInterface;
-use Interop\Http\Middleware\DelegateInterface;
-use Interop\Http\Middleware\ServerMiddlewareInterface;
+use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * @covers Emonkak\HttpMiddleware\Dispatcher
  */
-class DispatcherTest extends \PHPUnit_Framework_TestCase
+class DispatcherTest extends TestCase
 {
     public function testNoMatch()
     {
         $path = '/foo/123';
 
         $request = $this->createMockRequest('GET', $path);
-        $response = $this->getMock(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        $delegate = $this->getMock(DelegateInterface::class);
-        $delegate
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler
             ->expects($this->once())
-            ->method('process')
+            ->method('handle')
             ->with($this->identicalTo($request))
             ->willReturn($response);
 
-        $router = $this->getMock(RouterInterface::class);
+        $router = $this->createMock(RouterInterface::class);
         $router
             ->expects($this->once())
             ->method('match')
             ->with($path)
             ->willReturn(null);
 
-        $container = $this->getMock(ContainerInterface::class);
+        $container = $this->createMock(ContainerInterface::class);
 
         $dispatcher = new Dispatcher($router, $container);
 
-        $this->assertSame($response, $dispatcher->process($request, $delegate));
+        $this->assertSame($response, $dispatcher->process($request, $handler));
     }
 
     public function testMatchedController()
@@ -58,14 +58,14 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnSelf());
 
-        $response = $this->getMock(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        $delegate = $this->getMock(DelegateInterface::class);
-        $delegate
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler
             ->expects($this->never())
-            ->method('process');
+            ->method('handle');
 
-        $router = $this->getMock(RouterInterface::class);
+        $router = $this->createMock(RouterInterface::class);
         $router
             ->expects($this->once())
             ->method('match')
@@ -75,7 +75,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                 ['foo_id' => 123, 'bar_id' => 456]
             ]);
 
-        $container = $this->getMock(ContainerInterface::class);
+        $container = $this->createMock(ContainerInterface::class);
         $container
             ->expects($this->once())
             ->method('get')
@@ -84,7 +84,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new Dispatcher($router, $container);
 
-        $this->assertSame($response, $dispatcher->process($request, $delegate));
+        $this->assertSame($response, $dispatcher->process($request, $handler));
     }
 
     public function testMatchedMiddleware()
@@ -101,14 +101,14 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnSelf());
 
-        $response = $this->getMock(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        $delegate = $this->getMock(DelegateInterface::class);
-        $delegate
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler
             ->expects($this->never())
-            ->method('process');
+            ->method('handle');
 
-        $router = $this->getMock(RouterInterface::class);
+        $router = $this->createMock(RouterInterface::class);
         $router
             ->expects($this->once())
             ->method('match')
@@ -118,7 +118,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                 ['foo_id' => 123, 'bar_id' => 456]
             ]);
 
-        $container = $this->getMock(ContainerInterface::class);
+        $container = $this->createMock(ContainerInterface::class);
         $container
             ->expects($this->once())
             ->method('get')
@@ -127,7 +127,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new Dispatcher($router, $container);
 
-        $this->assertSame($response, $dispatcher->process($request, $delegate));
+        $this->assertSame($response, $dispatcher->process($request, $handler));
     }
 
     /**
@@ -139,14 +139,14 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $request = $this->createMockRequest('POST', $path);
 
-        $response = $this->getMock(ResponseInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        $delegate = $this->getMock(DelegateInterface::class);
-        $delegate
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler
             ->expects($this->never())
-            ->method('process');
+            ->method('handle');
 
-        $router = $this->getMock(RouterInterface::class);
+        $router = $this->createMock(RouterInterface::class);
         $router
             ->expects($this->once())
             ->method('match')
@@ -156,22 +156,22 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                 ['foo_id' => 123, 'bar_id' => 456]
             ]);
 
-        $container = $this->getMock(ContainerInterface::class);
+        $container = $this->createMock(ContainerInterface::class);
 
         $dispatcher = new Dispatcher($router, $container);
 
-        $this->assertSame($response, $dispatcher->process($request, $delegate));
+        $this->assertSame($response, $dispatcher->process($request, $handler));
     }
 
     private function createMockRequest($method, $path)
     {
-        $uri = $this->getMock(UriInterface::class);
+        $uri = $this->createMock(UriInterface::class);
         $uri
             ->expects($this->any())
             ->method('getPath')
             ->willReturn($path);
 
-        $request = $this->getMock(ServerRequestInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
         $request
             ->expects($this->any())
             ->method('getMethod')
@@ -194,13 +194,13 @@ class DispatcherTestController
         $this->response = $response;
     }
 
-    public function show(ServerRequestInterface $request, DelegateInterface $delegate)
+    public function show(ServerRequestInterface $request): ResponseInterface
     {
         return $this->response;
     }
 }
 
-class DispatcherTestMiddleware implements ServerMiddlewareInterface
+class DispatcherTestMiddleware implements RequestHandlerInterface
 {
     private $response;
 
@@ -209,7 +209,7 @@ class DispatcherTestMiddleware implements ServerMiddlewareInterface
         $this->response = $response;
     }
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return $this->response;
     }

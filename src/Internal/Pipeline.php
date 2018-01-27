@@ -3,13 +3,14 @@
 namespace Emonkak\HttpMiddleware\Internal;
 
 use Emonkak\HttpException\NotFoundHttpException;
-use Interop\Http\Middleware\DelegateInterface;
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * @internal
  */
-class Pipeline implements DelegateInterface
+class Pipeline implements RequestHandlerInterface
 {
     /**
      * @var \SplQueue
@@ -27,7 +28,7 @@ class Pipeline implements DelegateInterface
     /**
      * {@inheritDoc}
      */
-    public function process(RequestInterface $request)
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         if ($this->middlewares->isEmpty()) {
             throw new NotFoundHttpException('No middleware available for processing');

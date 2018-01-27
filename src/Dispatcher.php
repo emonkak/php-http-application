@@ -4,12 +4,13 @@ namespace Emonkak\HttpMiddleware;
 
 use Emonkak\HttpException\MethodNotAllowedHttpException;
 use Emonkak\Router\RouterInterface;
-use Interop\Container\ContainerInterface;
-use Interop\Http\Middleware\DelegateInterface;
-use Interop\Http\Middleware\ServerMiddlewareInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-class Dispatcher implements ServerMiddlewareInterface
+class Dispatcher implements MiddlewareInterface
 {
     /**
      * @var RouterInterface
@@ -36,11 +37,11 @@ class Dispatcher implements ServerMiddlewareInterface
     /**
      * {@inheritDoc}
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $match = $this->router->match($request->getUri()->getPath());
         if ($match === null) {
-            return $delegate->process($request);
+            return $handler->handle($request);
         }
 
         list ($handlers, $params) = $match;
@@ -54,18 +55,18 @@ class Dispatcher implements ServerMiddlewareInterface
             $request = $request->withAttribute($name, $value);
         }
 
-        $handler = $handlers[$method];
+        $handlerReference = $handlers[$method];
 
-        if (is_array($handler)) {
-            list ($class, $method) = $handler;
+        if (is_array($handlerReference)) {
+            list ($class, $method) = $handlerReference;
 
             $instance = $this->container->get($class);
 
-            return $instance->$method($request, $delegate);
+            return $instance->$method($request);
         } else {
-            $middleware = $this->container->get($handler);
+            $handler = $this->container->get($handlerReference);
 
-            return $middleware->process($request, $delegate);
+            return $handler->handle($request);
         }
     }
 }

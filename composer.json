@@ -9,16 +9,17 @@
         }
     ],
     "require": {
-        "php": ">=5.5",
-        "container-interop/container-interop": "^1.1",
+        "php": ">=7.0",
         "emonkak/http-exception": "^1.0",
         "emonkak/router": "^0.1.0",
-        "http-interop/http-middleware": "^0.3.0",
         "psr/http-message": "^1.0",
-        "psr/log": "^1.0"
+        "psr/log": "^1.0",
+        "psr/http-server-middleware": "^1.0",
+        "psr/http-server-handler": "^1.0",
+        "psr/container": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.4",
+        "phpunit/phpunit": "^6.5",
         "satooshi/php-coveralls": "^1.0"
     },
     "autoload": {

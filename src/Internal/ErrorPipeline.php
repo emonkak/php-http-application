@@ -3,14 +3,14 @@
 namespace Emonkak\HttpMiddleware\Internal;
 
 use Emonkak\HttpException\HttpExceptionInterface;
-use Emonkak\HttpMiddleware\ErrorDelegateInterface;
-use Psr\Http\Message\RequestInterface;
+use Emonkak\HttpMiddleware\ErrorHandlerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * @internal
  */
-class ErrorPipeline implements ErrorDelegateInterface
+class ErrorPipeline implements ErrorHandlerInterface
 {
     /**
      * @var \SplQueue
@@ -30,7 +30,7 @@ class ErrorPipeline implements ErrorDelegateInterface
      * @param HttpExceptionInterface $exception
      * @return ResponseInterface
      */
-    public function processError(RequestInterface $request, HttpExceptionInterface $exception)
+    public function handleError(ServerRequestInterface $request, HttpExceptionInterface $exception): ResponseInterface
     {
         if ($this->errorMiddlewares->isEmpty()) {
             throw $exception;
