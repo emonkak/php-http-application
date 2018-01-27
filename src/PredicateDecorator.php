@@ -2,14 +2,15 @@
 
 namespace Emonkak\HttpMiddleware;
 
-use Interop\Http\Middleware\DelegateInterface;
-use Interop\Http\Middleware\ServerMiddlewareInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-class PredicateDecorator implements ServerMiddlewareInterface
+class PredicateDecorator implements MiddlewareInterface
 {
     /**
-     * @var ServerMiddlewareInterface
+     * @var MiddlewareInterface
      */
     private $middleware;
 
@@ -19,10 +20,10 @@ class PredicateDecorator implements ServerMiddlewareInterface
     private $predicate;
 
     /**
-     * @param ServerMiddlewareInterface $middleware
+     * @param MiddlewareInterface $middleware
      * @param callable                  $predicate
      */
-    public function __construct(ServerMiddlewareInterface $middleware, callable $predicate)
+    public function __construct(MiddlewareInterface $middleware, callable $predicate)
     {
         $this->middleware = $middleware;
         $this->predicate = $predicate;
@@ -31,13 +32,13 @@ class PredicateDecorator implements ServerMiddlewareInterface
     /**
      * {@inheritDoc}
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $predicate = $this->predicate;
         if (!$predicate($request)) {
-            return $delegate->process($request);
+            return $handler->handle($request);
         }
 
-        return $this->middleware->process($request, $delegate);
+        return $this->middleware->process($request, $handler);
     }
 }

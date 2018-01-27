@@ -3,16 +3,15 @@
 namespace Emonkak\HttpMiddleware;
 
 use Emonkak\HttpException\HttpExceptionInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
-interface ErrorMiddlewareInterface
+interface ErrorHandlerInterface
 {
     /**
      * @param ServerRequestInterface $request
      * @param HttpExceptionInterface $exception
-     * @param ErrorHandlerInterface  $handler
      * @return ResponseInterface
      */
-    public function processError(ServerRequestInterface $request, HttpExceptionInterface $exception, ErrorHandlerInterface $handler): ResponseInterface;
+    public function handleError(ServerRequestInterface $request, HttpExceptionInterface $exception): ResponseInterface;
 }

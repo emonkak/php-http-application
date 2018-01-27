@@ -3,30 +3,30 @@
 namespace Emonkak\HttpMiddleware\Tests\Internal;
 
 use Emonkak\HttpMiddleware\Internal\Pipeline;
-use Interop\Http\Middleware\ServerMiddlewareInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 
 /**
  * @covers Emonkak\HttpMiddleware\Internal\Pipeline
  */
-class PipelineTest extends \PHPUnit_Framework_TestCase
+class PipelineTest extends TestCase
 {
     public function testProcess()
     {
-        $request = $this->getMock(ServerRequestInterface::class);
-        $response = $this->getMock(ResponseInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
         $middlewares = [
-            $this->getMock(ServerMiddlewareInterface::class),
-            $this->getMock(ServerMiddlewareInterface::class),
-            $this->getMock(ServerMiddlewareInterface::class),
+            $this->createMock(MiddlewareInterface::class),
+            $this->createMock(MiddlewareInterface::class),
+            $this->createMock(MiddlewareInterface::class),
         ];
 
-        $queue = new \SplQueue();
-        $pipeline = new Pipeline($queue);
-        $delegate = function($request, $delegate) {
-            return $delegate->process($request);
+        $pipeline = new Pipeline($middlewares);
+        $handler = function($request, $handler) {
+            return $handler->handle($request);
         };
 
         $middlewares[0]
@@ -36,7 +36,7 @@ class PipelineTest extends \PHPUnit_Framework_TestCase
                 $this->identicalTo($request),
                 $this->identicalTo($pipeline)
             )
-            ->will($this->returnCallback($delegate));
+            ->will($this->returnCallback($handler));
         $middlewares[1]
             ->expects($this->once())
             ->method('process')
@@ -44,7 +44,7 @@ class PipelineTest extends \PHPUnit_Framework_TestCase
                 $this->identicalTo($request),
                 $this->identicalTo($pipeline)
             )
-            ->will($this->returnCallback($delegate));
+            ->will($this->returnCallback($handler));
         $middlewares[2]
             ->expects($this->once())
             ->method('process')
@@ -54,11 +54,7 @@ class PipelineTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn($response);
 
-        foreach ($middlewares as $middleware) {
-            $queue->enqueue($middleware);
-        }
-
-        $this->assertSame($response, $pipeline->process($request));
+        $this->assertSame($response, $pipeline->handle($request));
     }
 
     /**
@@ -66,11 +62,10 @@ class PipelineTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessThrowsHttpExceptionInterface()
     {
-        $request = $this->getMock(ServerRequestInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
 
-        $queue = new \SplQueue();
-        $errorPipeline = new Pipeline($queue);
+        $errorPipeline = new Pipeline([]);
 
-        $errorPipeline->process($request);
+        $errorPipeline->handle($request);
     }
 }

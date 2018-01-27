@@ -26,14 +26,14 @@ class ErrorLogger implements ErrorMiddlewareInterface
     /**
      * {@inheritDoc}
      */
-    public function processError(ServerRequestInterface $request, HttpExceptionInterface $exception, ErrorDelegateInterface $delegate)
+    public function processError(ServerRequestInterface $request, HttpExceptionInterface $exception, ErrorHandlerInterface $handler): ResponseInterface
     {
         $this->logger->log(
             $this->getLogLevel($exception),
             'Uncaught exception',
             ['exception' => $exception]
         );
-        return $delegate->processError($request, $exception);
+        return $handler->handleError($request, $exception);
     }
 
     /**

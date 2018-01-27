@@ -3,24 +3,29 @@
 namespace Emonkak\HttpMiddleware\Internal;
 
 use Emonkak\HttpException\HttpExceptionInterface;
-use Emonkak\HttpMiddleware\ErrorDelegateInterface;
-use Psr\Http\Message\RequestInterface;
+use Emonkak\HttpMiddleware\ErrorHandlerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * @internal
  */
-class ErrorPipeline implements ErrorDelegateInterface
+class ErrorPipeline implements ErrorHandlerInterface
 {
     /**
-     * @var \SplQueue
+     * @var ErrorMiddlewareInterface[]
      */
     private $errorMiddlewares;
 
     /**
-     * @param \SplQueue $errorMiddlewares
+     * @var int
      */
-    public function __construct(\SplQueue $errorMiddlewares)
+    private $index = 0;
+
+    /**
+     * @param ErrorMiddlewareInterface[] $errorMiddlewares
+     */
+    public function __construct(array $errorMiddlewares)
     {
         $this->errorMiddlewares = $errorMiddlewares;
     }
@@ -30,13 +35,13 @@ class ErrorPipeline implements ErrorDelegateInterface
      * @param HttpExceptionInterface $exception
      * @return ResponseInterface
      */
-    public function processError(RequestInterface $request, HttpExceptionInterface $exception)
+    public function handleError(ServerRequestInterface $request, HttpExceptionInterface $exception): ResponseInterface
     {
-        if ($this->errorMiddlewares->isEmpty()) {
+        if ($this->index >= count($this->errorMiddlewares)) {
             throw $exception;
         }
 
-        $errorMiddleware = $this->errorMiddlewares->dequeue();
+        $errorMiddleware = $this->errorMiddlewares[$this->index++];
 
         return $errorMiddleware->processError($request, $exception, $this);
     }

@@ -3,30 +3,31 @@
 namespace Emonkak\HttpMiddleware\Tests;
 
 use Emonkak\HttpMiddleware\PredicateDecorator;
-use Interop\Http\Middleware\DelegateInterface;
-use Interop\Http\Middleware\ServerMiddlewareInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * @covers Emonkak\HttpMiddleware\PredicateDecorator
  */
-class PredicateDecoratorTest extends \PHPUnit_Framework_TestCase
+class PredicateDecoratorTest extends TestCase
 {
     public function testFulfilled()
     {
-        $request = $this->getMock(ServerRequestInterface::class);
-        $response = $this->getMock(ResponseInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        $delegate = $this->getMock(DelegateInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
 
-        $middleware = $this->getMock(ServerMiddlewareInterface::class);
+        $middleware = $this->createMock(MiddlewareInterface::class);
         $middleware
             ->expects($this->once())
             ->method('process')
             ->with(
                 $this->identicalTo($request),
-                $this->identicalTo($delegate)
+                $this->identicalTo($handler)
             )
             ->willReturn($response);
 
@@ -35,22 +36,22 @@ class PredicateDecoratorTest extends \PHPUnit_Framework_TestCase
         };
         $decorator = new PredicateDecorator($middleware, $predicate);
 
-        $this->assertSame($response, $decorator->process($request, $delegate));
+        $this->assertSame($response, $decorator->process($request, $handler));
     }
 
     public function testNotFulfilled()
     {
-        $request = $this->getMock(ServerRequestInterface::class);
-        $response = $this->getMock(ResponseInterface::class);
+        $request = $this->createMock(ServerRequestInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
 
-        $delegate = $this->getMock(DelegateInterface::class);
-        $delegate
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler
             ->expects($this->once())
-            ->method('process')
+            ->method('handle')
             ->with($this->identicalTo($request))
             ->willReturn($response);
 
-        $middleware = $this->getMock(ServerMiddlewareInterface::class);
+        $middleware = $this->createMock(MiddlewareInterface::class);
         $middleware
             ->expects($this->never())
             ->method('process');
@@ -60,6 +61,6 @@ class PredicateDecoratorTest extends \PHPUnit_Framework_TestCase
         };
         $decorator = new PredicateDecorator($middleware, $predicate);
 
-        $this->assertSame($response, $decorator->process($request, $delegate));
+        $this->assertSame($response, $decorator->process($request, $handler));
     }
 }
