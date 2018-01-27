@@ -46,15 +46,16 @@ class DispatcherTest extends TestCase
 
     public function testMatchedController()
     {
-        $path = '/foo/123/bar/456';
+        $path = '/foo/123/bar/456/baz/%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A';
 
         $request = $this->createMockRequest('GET', $path);
         $request
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('withAttribute')
             ->withConsecutive(
                 ['foo_id', 123],
-                ['bar_id', 456]
+                ['bar_id', 456],
+                ['baz_id', 'あいうえお']
             )
             ->will($this->returnSelf());
 
@@ -69,10 +70,10 @@ class DispatcherTest extends TestCase
         $router
             ->expects($this->once())
             ->method('match')
-            ->with($path)
+            ->with('/foo/123/bar/456/baz/あいうえお')
             ->willReturn([
                 ['GET' => [DispatcherTestController::class, 'show']],
-                ['foo_id' => 123, 'bar_id' => 456]
+                ['foo_id' => 123, 'bar_id' => 456, 'baz_id' => 'あいうえお']
             ]);
 
         $container = $this->createMock(ContainerInterface::class);

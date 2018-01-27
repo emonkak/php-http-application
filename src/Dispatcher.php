@@ -39,7 +39,9 @@ class Dispatcher implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $match = $this->router->match($request->getUri()->getPath());
+        $path = urldecode($request->getUri()->getPath());
+        $match = $this->router->match($path);
+
         if ($match === null) {
             return $handler->handle($request);
         }
