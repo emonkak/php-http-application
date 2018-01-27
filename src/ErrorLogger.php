@@ -40,7 +40,7 @@ class ErrorLogger implements ErrorMiddlewareInterface
      * @param HttpExceptionInterface $exception
      * @return string
      */
-    protected function getLogLevel(HttpExceptionInterface $exception)
+    protected function getLogLevel(HttpExceptionInterface $exception): string
     {
         $statusCode = $exception->getStatusCode();
         if ($statusCode >= 500) {

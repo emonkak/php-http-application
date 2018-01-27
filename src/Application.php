@@ -78,7 +78,7 @@ class Application implements ErrorHandlerInterface, RequestHandlerInterface
      * @param string              $path
      * @return $this
      */
-    public function pipeOn(MiddlewareInterface $middleware, $path): Application
+    public function pipeOn(MiddlewareInterface $middleware, string $path): Application
     {
         return $this->pipeIf($middleware, static function(ServerRequestInterface $request) use ($path) {
             return strpos($request->getUri()->getPath(), $path) === 0;
@@ -86,7 +86,7 @@ class Application implements ErrorHandlerInterface, RequestHandlerInterface
     }
 
     /**
-     * @param MiddlewareInterface $middleware
+     * @param ErrorMiddlewareInterface $errorMiddleware
      * @return $this
      */
     public function pipeOnError(ErrorMiddlewareInterface $errorMiddleware): Application
