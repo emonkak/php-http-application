@@ -24,8 +24,7 @@ class PipelineTest extends TestCase
             $this->createMock(MiddlewareInterface::class),
         ];
 
-        $queue = new \SplQueue();
-        $pipeline = new Pipeline($queue);
+        $pipeline = new Pipeline($middlewares);
         $handler = function($request, $handler) {
             return $handler->handle($request);
         };
@@ -55,10 +54,6 @@ class PipelineTest extends TestCase
             )
             ->willReturn($response);
 
-        foreach ($middlewares as $middleware) {
-            $queue->enqueue($middleware);
-        }
-
         $this->assertSame($response, $pipeline->handle($request));
     }
 
@@ -69,8 +64,7 @@ class PipelineTest extends TestCase
     {
         $request = $this->createMock(ServerRequestInterface::class);
 
-        $queue = new \SplQueue();
-        $errorPipeline = new Pipeline($queue);
+        $errorPipeline = new Pipeline([]);
 
         $errorPipeline->handle($request);
     }

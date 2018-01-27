@@ -27,8 +27,7 @@ class ErrorPipelineTest extends TestCase
             $this->createMock(ErrorMiddlewareInterface::class),
         ];
 
-        $queue = new \SplQueue();
-        $errorPipeline = new ErrorPipeline($queue);
+        $errorPipeline = new ErrorPipeline($errorMiddlewares);
         $handler = function($request, $exception, $handler) {
             return $handler->handleError($request, $exception);
         };
@@ -61,10 +60,6 @@ class ErrorPipelineTest extends TestCase
             )
             ->willReturn($response);
 
-        foreach ($errorMiddlewares as $errorMiddleware) {
-            $queue->enqueue($errorMiddleware);
-        }
-
         $this->assertSame($response, $errorPipeline->handleError($request, $exception));
     }
 
@@ -76,8 +71,7 @@ class ErrorPipelineTest extends TestCase
         $request = $this->createMock(ServerRequestInterface::class);
         $exception = new HttpException(500);
 
-        $queue = new \SplQueue();
-        $errorPipeline = new ErrorPipeline($queue);
+        $errorPipeline = new ErrorPipeline([]);
 
         $errorPipeline->handleError($request, $exception);
     }

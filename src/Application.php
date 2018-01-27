@@ -14,20 +14,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 class Application implements ErrorHandlerInterface, RequestHandlerInterface
 {
     /**
-     * @var \SplQueue
+     * @var MiddlewareInterface[]
      */
-    private $middlewares;
+    private $middlewares = [];
 
     /**
-     * @var \SplQueue
+     * @var ErrorMiddlewareInterface[]
      */
-    private $errorMiddlewares;
-
-    public function __construct()
-    {
-        $this->middlewares = new \SplQueue();
-        $this->errorMiddlewares = new \SplQueue();
-    }
+    private $errorMiddlewares = [];
 
     /**
      * @param ServerRequestInterface $request
@@ -35,7 +29,7 @@ class Application implements ErrorHandlerInterface, RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $pipeline = new Pipeline(clone $this->middlewares);
+        $pipeline = new Pipeline($this->middlewares);
 
         try {
             return $pipeline->handle($request);
@@ -53,7 +47,7 @@ class Application implements ErrorHandlerInterface, RequestHandlerInterface
      */
     public function handleError(ServerRequestInterface $request, HttpExceptionInterface $exception): ResponseInterface
     {
-        $pipeline = new ErrorPipeline(clone $this->errorMiddlewares);
+        $pipeline = new ErrorPipeline($this->errorMiddlewares);
 
         return $pipeline->handleError($request, $exception);
     }
@@ -64,7 +58,7 @@ class Application implements ErrorHandlerInterface, RequestHandlerInterface
      */
     public function pipe(MiddlewareInterface $middleware): Application
     {
-        $this->middlewares->enqueue($middleware);
+        $this->middlewares[] = $middleware;
 
         return $this;
     }
@@ -97,7 +91,7 @@ class Application implements ErrorHandlerInterface, RequestHandlerInterface
      */
     public function pipeOnError(ErrorMiddlewareInterface $errorMiddleware): Application
     {
-        $this->errorMiddlewares->enqueue($errorMiddleware);
+        $this->errorMiddlewares[] = $errorMiddleware;
 
         return $this;
     }

@@ -13,14 +13,19 @@ use Psr\Http\Server\RequestHandlerInterface;
 class Pipeline implements RequestHandlerInterface
 {
     /**
-     * @var \SplQueue
+     * @var MiddlewareInterface[]
      */
     private $middlewares;
 
     /**
-     * @param \SplQueue $middlewares
+     * @var int
      */
-    public function __construct(\SplQueue $middlewares)
+    private $index = 0;
+
+    /**
+     * @param MiddlewareInterface[] $middlewares
+     */
+    public function __construct(array $middlewares)
     {
         $this->middlewares = $middlewares;
     }
@@ -30,11 +35,11 @@ class Pipeline implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        if ($this->middlewares->isEmpty()) {
+        if ($this->index >= count($this->middlewares)) {
             throw new NotFoundHttpException('No middleware available for processing');
         }
 
-        $middleware = $this->middlewares->dequeue();
+        $middleware = $this->middlewares[$this->index++];
 
         return $middleware->process($request, $this);
     }

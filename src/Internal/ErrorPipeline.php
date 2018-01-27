@@ -13,14 +13,19 @@ use Psr\Http\Message\ResponseInterface;
 class ErrorPipeline implements ErrorHandlerInterface
 {
     /**
-     * @var \SplQueue
+     * @var ErrorMiddlewareInterface[]
      */
     private $errorMiddlewares;
 
     /**
-     * @param \SplQueue $errorMiddlewares
+     * @var int
      */
-    public function __construct(\SplQueue $errorMiddlewares)
+    private $index = 0;
+
+    /**
+     * @param ErrorMiddlewareInterface[] $errorMiddlewares
+     */
+    public function __construct(array $errorMiddlewares)
     {
         $this->errorMiddlewares = $errorMiddlewares;
     }
@@ -32,11 +37,11 @@ class ErrorPipeline implements ErrorHandlerInterface
      */
     public function handleError(ServerRequestInterface $request, HttpExceptionInterface $exception): ResponseInterface
     {
-        if ($this->errorMiddlewares->isEmpty()) {
+        if ($this->index >= count($this->errorMiddlewares)) {
             throw $exception;
         }
 
-        $errorMiddleware = $this->errorMiddlewares->dequeue();
+        $errorMiddleware = $this->errorMiddlewares[$this->index++];
 
         return $errorMiddleware->processError($request, $exception, $this);
     }
