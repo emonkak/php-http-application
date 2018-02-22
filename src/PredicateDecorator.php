@@ -21,7 +21,7 @@ class PredicateDecorator implements MiddlewareInterface
 
     /**
      * @param MiddlewareInterface $middleware
-     * @param callable                  $predicate
+     * @param callable            $predicate
      */
     public function __construct(MiddlewareInterface $middleware, callable $predicate)
     {
@@ -35,10 +35,9 @@ class PredicateDecorator implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $predicate = $this->predicate;
-        if (!$predicate($request)) {
-            return $handler->handle($request);
-        }
 
-        return $this->middleware->process($request, $handler);
+        return $predicate($request)
+            ? $this->middleware->process($request, $handler)
+            : $handler->handle($request);
     }
 }
