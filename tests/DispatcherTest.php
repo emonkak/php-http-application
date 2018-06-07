@@ -16,7 +16,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 class DispatcherTest extends TestCase
 {
-    public function testNoMatch()
+    public function testNotMatched()
     {
         $path = '/foo/123';
 
@@ -44,7 +44,7 @@ class DispatcherTest extends TestCase
         $this->assertSame($response, $dispatcher->process($request, $handler));
     }
 
-    public function testMatchedController()
+    public function testControllerMatched()
     {
         $path = '/foo/123/bar/456/baz/%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A';
 
@@ -70,10 +70,10 @@ class DispatcherTest extends TestCase
         $router
             ->expects($this->once())
             ->method('match')
-            ->with('/foo/123/bar/456/baz/あいうえお')
+            ->with('/foo/123/bar/456/baz/%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A')
             ->willReturn([
                 ['GET' => [DispatcherTestController::class, 'show']],
-                ['foo_id' => 123, 'bar_id' => 456, 'baz_id' => 'あいうえお']
+                ['foo_id' => 123, 'bar_id' => 456, 'baz_id' => '%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A']
             ]);
 
         $container = $this->createMock(ContainerInterface::class);
@@ -88,7 +88,7 @@ class DispatcherTest extends TestCase
         $this->assertSame($response, $dispatcher->process($request, $handler));
     }
 
-    public function testMatchedMiddleware()
+    public function testMiddlewareMatched()
     {
         $path = '/foo/123/bar/456';
 

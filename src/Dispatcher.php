@@ -39,7 +39,7 @@ class Dispatcher implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $path = urldecode($request->getUri()->getPath());
+        $path = $request->getUri()->getPath();
         $match = $this->router->match($path);
 
         if ($match === null) {
@@ -54,7 +54,7 @@ class Dispatcher implements MiddlewareInterface
         }
 
         foreach ($params as $name => $value) {
-            $request = $request->withAttribute($name, $value);
+            $request = $request->withAttribute($name, urldecode($value));
         }
 
         $handlerReference = $handlers[$method];
