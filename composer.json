@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": ">=7.0",
-        "emonkak/http-exception": "^1.0",
+        "emonkak/http-exception": "^2.0",
         "emonkak/router": "^0.1",
         "psr/http-message": "^1.0",
         "psr/log": "^1.0",

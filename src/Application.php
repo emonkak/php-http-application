@@ -36,7 +36,7 @@ class Application implements ErrorHandlerInterface, RequestHandlerInterface
         } catch (HttpExceptionInterface $e) {
             return $this->handleError($request, $e);
         } catch (\Exception $e) {
-            return $this->handleError($request, new InternalServerErrorHttpException(null, $e));
+            return $this->handleError($request, new InternalServerErrorHttpException('', $e));
         }
     }
 
