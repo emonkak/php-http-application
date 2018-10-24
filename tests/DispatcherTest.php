@@ -131,6 +131,92 @@ class DispatcherTest extends TestCase
         $this->assertSame($response, $dispatcher->process($request, $handler));
     }
 
+    public function testHeadRequest()
+    {
+        $path = '/foo/123/bar/456';
+
+        $request = $this->createMockRequest('HEAD', $path);
+        $request
+            ->expects($this->exactly(2))
+            ->method('withAttribute')
+            ->withConsecutive(
+                ['foo_id', 123],
+                ['bar_id', 456]
+            )
+            ->will($this->returnSelf());
+
+        $response = $this->createMock(ResponseInterface::class);
+
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler
+            ->expects($this->never())
+            ->method('handle');
+
+        $router = $this->createMock(RouterInterface::class);
+        $router
+            ->expects($this->once())
+            ->method('match')
+            ->with($path)
+            ->willReturn([
+                ['HEAD' => DispatcherTestMiddleware::class],
+                ['foo_id' => 123, 'bar_id' => 456]
+            ]);
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with(DispatcherTestMiddleware::class)
+            ->willReturn(new DispatcherTestMiddleware($response));
+
+        $dispatcher = new Dispatcher($router, $container);
+
+        $this->assertSame($response, $dispatcher->process($request, $handler));
+    }
+
+    public function testFalllbackGetRequest()
+    {
+        $path = '/foo/123/bar/456';
+
+        $request = $this->createMockRequest('HEAD', $path);
+        $request
+            ->expects($this->exactly(2))
+            ->method('withAttribute')
+            ->withConsecutive(
+                ['foo_id', 123],
+                ['bar_id', 456]
+            )
+            ->will($this->returnSelf());
+
+        $response = $this->createMock(ResponseInterface::class);
+
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler
+            ->expects($this->never())
+            ->method('handle');
+
+        $router = $this->createMock(RouterInterface::class);
+        $router
+            ->expects($this->once())
+            ->method('match')
+            ->with($path)
+            ->willReturn([
+                ['HEAD' => DispatcherTestMiddleware::class],
+                ['foo_id' => 123, 'bar_id' => 456]
+            ]);
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with(DispatcherTestMiddleware::class)
+            ->willReturn(new DispatcherTestMiddleware($response));
+
+        $dispatcher = new Dispatcher($router, $container);
+
+        $this->assertSame($response, $dispatcher->process($request, $handler));
+    }
+
     /**
      * @expectedException Emonkak\HttpException\MethodNotAllowedHttpException
      */

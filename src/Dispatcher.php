@@ -49,15 +49,21 @@ class Dispatcher implements MiddlewareInterface
         list ($handlers, $params) = $match;
         $method = strtoupper($request->getMethod());
 
-        if (!isset($handlers[$method])) {
+        if ($method === 'HEAD') {
+            $handlerReference = isset($handlers[$method])
+                ? $handlers[$method]
+                : (isset($handlers['GET']) ? $handlers['GET'] : null);
+        } else {
+            $handlerReference = isset($handlers[$method]) ? $handlers[$method] : null;
+        }
+
+        if ($handlerReference === null) {
             throw new MethodNotAllowedHttpException(array_keys($handlers));
         }
 
         foreach ($params as $name => $value) {
             $request = $request->withAttribute($name, urldecode($value));
         }
-
-        $handlerReference = $handlers[$method];
 
         if (is_array($handlerReference)) {
             list ($class, $method) = $handlerReference;
