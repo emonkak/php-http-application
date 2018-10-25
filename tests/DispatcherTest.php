@@ -6,6 +6,7 @@ use Emonkak\HttpMiddleware\Dispatcher;
 use Emonkak\Router\RouterInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
@@ -30,6 +31,13 @@ class DispatcherTest extends TestCase
             ->with($this->identicalTo($request))
             ->willReturn($response);
 
+        $responseFactory = $this->createMock(ResponseFactoryInterface::class);
+        $responseFactory
+            ->expects($this->never())
+            ->method('createResponse');
+
+        $container = $this->createMock(ContainerInterface::class);
+
         $router = $this->createMock(RouterInterface::class);
         $router
             ->expects($this->once())
@@ -37,9 +45,7 @@ class DispatcherTest extends TestCase
             ->with($path)
             ->willReturn(null);
 
-        $container = $this->createMock(ContainerInterface::class);
-
-        $dispatcher = new Dispatcher($router, $container);
+        $dispatcher = new Dispatcher($container, $responseFactory, $router);
 
         $this->assertSame($response, $dispatcher->process($request, $handler));
     }
@@ -66,6 +72,18 @@ class DispatcherTest extends TestCase
             ->expects($this->never())
             ->method('handle');
 
+        $responseFactory = $this->createMock(ResponseFactoryInterface::class);
+        $responseFactory
+            ->expects($this->never())
+            ->method('createResponse');
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with(DispatcherTestController::class)
+            ->willReturn(new DispatcherTestController($response));
+
         $router = $this->createMock(RouterInterface::class);
         $router
             ->expects($this->once())
@@ -76,14 +94,7 @@ class DispatcherTest extends TestCase
                 ['foo_id' => 123, 'bar_id' => 456, 'baz_id' => '%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A']
             ]);
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->with(DispatcherTestController::class)
-            ->willReturn(new DispatcherTestController($response));
-
-        $dispatcher = new Dispatcher($router, $container);
+        $dispatcher = new Dispatcher($container, $responseFactory, $router);
 
         $this->assertSame($response, $dispatcher->process($request, $handler));
     }
@@ -109,6 +120,18 @@ class DispatcherTest extends TestCase
             ->expects($this->never())
             ->method('handle');
 
+        $responseFactory = $this->createMock(ResponseFactoryInterface::class);
+        $responseFactory
+            ->expects($this->never())
+            ->method('createResponse');
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with(DispatcherTestMiddleware::class)
+            ->willReturn(new DispatcherTestMiddleware($response));
+
         $router = $this->createMock(RouterInterface::class);
         $router
             ->expects($this->once())
@@ -119,14 +142,7 @@ class DispatcherTest extends TestCase
                 ['foo_id' => 123, 'bar_id' => 456]
             ]);
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->with(DispatcherTestMiddleware::class)
-            ->willReturn(new DispatcherTestMiddleware($response));
-
-        $dispatcher = new Dispatcher($router, $container);
+        $dispatcher = new Dispatcher($container, $responseFactory, $router);
 
         $this->assertSame($response, $dispatcher->process($request, $handler));
     }
@@ -152,6 +168,18 @@ class DispatcherTest extends TestCase
             ->expects($this->never())
             ->method('handle');
 
+        $responseFactory = $this->createMock(ResponseFactoryInterface::class);
+        $responseFactory
+            ->expects($this->never())
+            ->method('createResponse');
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with(DispatcherTestMiddleware::class)
+            ->willReturn(new DispatcherTestMiddleware($response));
+
         $router = $this->createMock(RouterInterface::class);
         $router
             ->expects($this->once())
@@ -162,14 +190,7 @@ class DispatcherTest extends TestCase
                 ['foo_id' => 123, 'bar_id' => 456]
             ]);
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->with(DispatcherTestMiddleware::class)
-            ->willReturn(new DispatcherTestMiddleware($response));
-
-        $dispatcher = new Dispatcher($router, $container);
+        $dispatcher = new Dispatcher($container, $responseFactory, $router);
 
         $this->assertSame($response, $dispatcher->process($request, $handler));
     }
@@ -195,6 +216,18 @@ class DispatcherTest extends TestCase
             ->expects($this->never())
             ->method('handle');
 
+        $responseFactory = $this->createMock(ResponseFactoryInterface::class);
+        $responseFactory
+            ->expects($this->never())
+            ->method('createResponse');
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with(DispatcherTestMiddleware::class)
+            ->willReturn(new DispatcherTestMiddleware($response));
+
         $router = $this->createMock(RouterInterface::class);
         $router
             ->expects($this->once())
@@ -205,14 +238,53 @@ class DispatcherTest extends TestCase
                 ['foo_id' => 123, 'bar_id' => 456]
             ]);
 
+        $dispatcher = new Dispatcher($container, $responseFactory, $router);
+
+        $this->assertSame($response, $dispatcher->process($request, $handler));
+    }
+
+    public function testOptionsRequest()
+    {
+        $path = '/foo/123/bar/456';
+
+        $request = $this->createMockRequest('OPTIONS', $path);
+
+        $response = $this->createMock(ResponseInterface::class);
+
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler
+            ->expects($this->never())
+            ->method('handle');
+
+        $response = $this->createMock(ResponseInterface::class);
+        $response
+            ->expects($this->once())
+            ->method('withHeader')
+            ->with($this->identicalTo('Allow'), $this->identicalTo('GET, HEAD'))
+            ->will($this->returnSelf());
+
+        $responseFactory = $this->createMock(ResponseFactoryInterface::class);
+        $responseFactory
+            ->expects($this->once())
+            ->method('createResponse')
+            ->willReturn($response);
+
         $container = $this->createMock(ContainerInterface::class);
         $container
-            ->expects($this->once())
-            ->method('get')
-            ->with(DispatcherTestMiddleware::class)
-            ->willReturn(new DispatcherTestMiddleware($response));
+            ->expects($this->never())
+            ->method('get');
 
-        $dispatcher = new Dispatcher($router, $container);
+        $router = $this->createMock(RouterInterface::class);
+        $router
+            ->expects($this->once())
+            ->method('match')
+            ->with($path)
+            ->willReturn([
+                ['GET' => DispatcherTestMiddleware::class],
+                ['foo_id' => 123, 'bar_id' => 456]
+            ]);
+
+        $dispatcher = new Dispatcher($container, $responseFactory, $router);
 
         $this->assertSame($response, $dispatcher->process($request, $handler));
     }
@@ -233,6 +305,13 @@ class DispatcherTest extends TestCase
             ->expects($this->never())
             ->method('handle');
 
+        $responseFactory = $this->createMock(ResponseFactoryInterface::class);
+        $responseFactory
+            ->expects($this->never())
+            ->method('createResponse');
+
+        $container = $this->createMock(ContainerInterface::class);
+
         $router = $this->createMock(RouterInterface::class);
         $router
             ->expects($this->once())
@@ -243,9 +322,7 @@ class DispatcherTest extends TestCase
                 ['foo_id' => 123, 'bar_id' => 456]
             ]);
 
-        $container = $this->createMock(ContainerInterface::class);
-
-        $dispatcher = new Dispatcher($router, $container);
+        $dispatcher = new Dispatcher($container, $responseFactory, $router);
 
         $this->assertSame($response, $dispatcher->process($request, $handler));
     }

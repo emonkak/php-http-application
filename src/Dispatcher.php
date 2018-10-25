@@ -5,33 +5,42 @@ namespace Emonkak\HttpMiddleware;
 use Emonkak\HttpException\MethodNotAllowedHttpException;
 use Emonkak\Router\RouterInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 class Dispatcher implements MiddlewareInterface
 {
     /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
      * @var ContainerInterface
      */
     private $container;
 
     /**
-     * @param RouterInterface    $router
-     * @param ContainerInterface $container
+     * @var ResponseFactoryInterface
+     */
+    private $responseFactory;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @param ContainerInterface       $container
+     * @param ResponseFactoryInterface $responseFactory
+     * @param RouterInterface          $router
      */
     public function __construct(
-        RouterInterface $router,
-        ContainerInterface $container
+        ContainerInterface $container,
+        ResponseFactoryInterface $responseFactory,
+        RouterInterface $router
     ) {
-        $this->router = $router;
         $this->container = $container;
+        $this->responseFactory = $responseFactory;
+        $this->router = $router;
     }
 
     /**
@@ -49,16 +58,26 @@ class Dispatcher implements MiddlewareInterface
         list ($handlers, $params) = $match;
         $method = strtoupper($request->getMethod());
 
-        if ($method === 'HEAD') {
-            $handlerReference = isset($handlers[$method])
-                ? $handlers[$method]
-                : (isset($handlers['GET']) ? $handlers['GET'] : null);
+        if (isset($handlers[$method])) {
+            $handlerReference = $handlers[$method];
         } else {
-            $handlerReference = isset($handlers[$method]) ? $handlers[$method] : null;
-        }
+            if ($method === 'OPTIONS') {
+                $allowedMethods = array_keys($handlers);
 
-        if ($handlerReference === null) {
-            throw new MethodNotAllowedHttpException(array_keys($handlers));
+                if (in_array('GET', $allowedMethods) && !in_array('HEAD', $allowedMethods)) {
+                    $allowedMethods[] = 'HEAD';
+                }
+
+                return $this->responseFactory
+                    ->createResponse()
+                    ->withHeader('Allow', implode(', ', $allowedMethods));
+            }
+
+            if ($method === 'HEAD' && isset($handlers['GET'])) {
+                $handlerReference = $handlers['GET'];
+            } else {
+                throw new MethodNotAllowedHttpException(array_keys($handlers));
+            }
         }
 
         foreach ($params as $name => $value) {
