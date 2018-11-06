@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\HttpMiddleware\Tests;
 
-use Emonkak\HttpException\HttpExceptionInterface;
-use Emonkak\HttpMiddleware\ErrorHandlerInterface;
+use Emonkak\HttpException\HttpException;
 use Emonkak\HttpMiddleware\ErrorLogger;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
 
@@ -17,24 +19,20 @@ use Psr\Log\LoggerInterface;
 class ErrorLoggerTest extends TestCase
 {
     /**
-     * @dataProvider providerProcessError
+     * @dataProvider providerHttpExeption
      */
-    public function testProcessError($statusCode, $expectedLogLevel)
+    public function testHttpExeption($statusCode, $expectedLogLevel)
     {
         $request = $this->createMock(ServerRequestInterface::class);
-        $response = $this->createMock(ResponseInterface::class);
 
-        $exception = $this->createMock(HttpExceptionInterface::class);
-        $exception
-            ->expects($this->once())
-            ->method('getStatusCode')
-            ->willReturn($statusCode);
+        $exception = new HttpException($statusCode);
 
-        $handler = $this->createMock(ErrorHandlerInterface::class);
+        $handler = $this->createMock(RequestHandlerInterface::class);
         $handler
             ->expects($this->once())
-            ->method('handleError')
-            ->willReturn($response);
+            ->method('handle')
+            ->with($this->identicalTo($request))
+            ->will($this->throwException($exception));
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger
@@ -48,10 +46,17 @@ class ErrorLoggerTest extends TestCase
 
         $errorLogger = new ErrorLogger($logger);
 
-        $this->assertSame($response, $errorLogger->processError($request, $exception, $handler));
+        try {
+            $errorLogger->process($request, $handler);
+            $this->assertFail();
+        } catch (HttpException $e) {
+            if ($exception !== $e) {
+                throw $e;
+            }
+        }
     }
 
-    public function providerProcessError()
+    public function providerHttpExeption()
     {
         return [
             [301, LogLevel::INFO],
@@ -59,5 +64,40 @@ class ErrorLoggerTest extends TestCase
             [400, LogLevel::WARNING],
             [500, LogLevel::ERROR],
         ];
+    }
+
+    public function testException()
+    {
+        $request = $this->createMock(ServerRequestInterface::class);
+
+        $exception = new \Exception();
+
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler
+            ->expects($this->once())
+            ->method('handle')
+            ->with($this->identicalTo($request))
+            ->will($this->throwException($exception));
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger
+            ->expects($this->once())
+            ->method('log')
+            ->with(
+                LogLevel::ERROR,
+                'Uncaught exception',
+                ['exception' => $exception]
+            );
+
+        $errorLogger = new ErrorLogger($logger);
+
+        try {
+            $errorLogger->process($request, $handler);
+            $this->assertFail();
+        } catch (\Exception $e) {
+            if ($exception !== $e) {
+                throw $e;
+            }
+        }
     }
 }

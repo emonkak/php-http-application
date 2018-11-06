@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\HttpMiddleware;
 
 use Emonkak\HttpException\HttpExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
 
-class ErrorLogger implements ErrorMiddlewareInterface
+class ErrorLogger implements MiddlewareInterface
 {
     /**
      * @var LoggerInterface
@@ -26,14 +30,25 @@ class ErrorLogger implements ErrorMiddlewareInterface
     /**
      * {@inheritDoc}
      */
-    public function processError(ServerRequestInterface $request, HttpExceptionInterface $exception, ErrorHandlerInterface $handler): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $this->logger->log(
-            $this->getLogLevel($exception),
-            'Uncaught exception',
-            ['exception' => $exception]
-        );
-        return $handler->handleError($request, $exception);
+        try {
+            return $handler->handle($request);
+        } catch (HttpExceptionInterface $e) {
+            $this->logger->log(
+                $this->getLogLevel($e),
+                'Uncaught exception',
+                ['exception' => $e]
+            );
+            throw $e;
+        } catch (\Throwable $e) {
+            $this->logger->log(
+                $this->getDefaultLogLevel(),
+                'Uncaught exception',
+                ['exception' => $e]
+            );
+            throw $e;
+        }
     }
 
     /**
@@ -50,5 +65,13 @@ class ErrorLogger implements ErrorMiddlewareInterface
         } else {
             return LogLevel::INFO;
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultLogLevel(): string
+    {
+        return LogLevel::ERROR;
     }
 }

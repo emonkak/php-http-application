@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\HttpMiddleware\Tests\Middleware;
 
 use Emonkak\HttpMiddleware\Dispatcher;
@@ -59,8 +61,8 @@ class DispatcherTest extends TestCase
             ->expects($this->exactly(3))
             ->method('withAttribute')
             ->withConsecutive(
-                ['foo_id', 123],
-                ['bar_id', 456],
+                ['foo_id', '123'],
+                ['bar_id', '456'],
                 ['baz_id', 'あいうえお']
             )
             ->will($this->returnSelf());
@@ -91,7 +93,7 @@ class DispatcherTest extends TestCase
             ->with('/foo/123/bar/456/baz/%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A')
             ->willReturn([
                 ['GET' => [DispatcherTestController::class, 'show']],
-                ['foo_id' => 123, 'bar_id' => 456, 'baz_id' => '%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A']
+                ['foo_id' => '123', 'bar_id' => '456', 'baz_id' => '%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A']
             ]);
 
         $dispatcher = new Dispatcher($container, $responseFactory, $router);
@@ -108,8 +110,8 @@ class DispatcherTest extends TestCase
             ->expects($this->exactly(2))
             ->method('withAttribute')
             ->withConsecutive(
-                ['foo_id', 123],
-                ['bar_id', 456]
+                ['foo_id', '123'],
+                ['bar_id', '456']
             )
             ->will($this->returnSelf());
 
@@ -139,7 +141,7 @@ class DispatcherTest extends TestCase
             ->with($path)
             ->willReturn([
                 ['GET' => DispatcherTestMiddleware::class],
-                ['foo_id' => 123, 'bar_id' => 456]
+                ['foo_id' => '123', 'bar_id' => '456']
             ]);
 
         $dispatcher = new Dispatcher($container, $responseFactory, $router);
@@ -156,8 +158,8 @@ class DispatcherTest extends TestCase
             ->expects($this->exactly(2))
             ->method('withAttribute')
             ->withConsecutive(
-                ['foo_id', 123],
-                ['bar_id', 456]
+                ['foo_id', '123'],
+                ['bar_id', '456']
             )
             ->will($this->returnSelf());
 
@@ -186,8 +188,8 @@ class DispatcherTest extends TestCase
             ->method('match')
             ->with($path)
             ->willReturn([
-                ['HEAD' => DispatcherTestMiddleware::class],
-                ['foo_id' => 123, 'bar_id' => 456]
+                ['GET' => DispatcherTestMiddleware::class],
+                ['foo_id' => '123', 'bar_id' => '456']
             ]);
 
         $dispatcher = new Dispatcher($container, $responseFactory, $router);
@@ -204,8 +206,8 @@ class DispatcherTest extends TestCase
             ->expects($this->exactly(2))
             ->method('withAttribute')
             ->withConsecutive(
-                ['foo_id', 123],
-                ['bar_id', 456]
+                ['foo_id', '123'],
+                ['bar_id', '456']
             )
             ->will($this->returnSelf());
 
@@ -235,7 +237,7 @@ class DispatcherTest extends TestCase
             ->with($path)
             ->willReturn([
                 ['HEAD' => DispatcherTestMiddleware::class],
-                ['foo_id' => 123, 'bar_id' => 456]
+                ['foo_id' => '123', 'bar_id' => '456']
             ]);
 
         $dispatcher = new Dispatcher($container, $responseFactory, $router);
@@ -281,7 +283,7 @@ class DispatcherTest extends TestCase
             ->with($path)
             ->willReturn([
                 ['GET' => DispatcherTestMiddleware::class],
-                ['foo_id' => 123, 'bar_id' => 456]
+                ['foo_id' => '123', 'bar_id' => '456']
             ]);
 
         $dispatcher = new Dispatcher($container, $responseFactory, $router);

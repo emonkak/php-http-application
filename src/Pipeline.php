@@ -1,6 +1,8 @@
 <?php
 
-namespace Emonkak\HttpMiddleware\Internal;
+declare(strict_types=1);
+
+namespace Emonkak\HttpMiddleware;
 
 use Emonkak\HttpException\NotFoundHttpException;
 use Psr\Http\Message\ResponseInterface;
