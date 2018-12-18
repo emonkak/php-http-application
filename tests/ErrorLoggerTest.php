@@ -59,8 +59,8 @@ class ErrorLoggerTest extends TestCase
     public function providerHttpExeption()
     {
         return [
-            [301, LogLevel::INFO],
-            [404, LogLevel::INFO],
+            [301, LogLevel::DEBUG],
+            [404, LogLevel::DEBUG],
             [400, LogLevel::WARNING],
             [500, LogLevel::ERROR],
         ];
