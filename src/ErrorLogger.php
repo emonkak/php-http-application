@@ -60,7 +60,7 @@ class ErrorLogger implements MiddlewareInterface
         $statusCode = $exception->getStatusCode();
         if ($statusCode >= 500) {
             return LogLevel::ERROR;
-        } elseif ($statusCode >= 400 && $statusCode !== 404) {
+        } elseif ($statusCode >= 400 && $statusCode !== 404 && $statusCode !== 405) {
             return LogLevel::WARNING;
         } else {
             return LogLevel::DEBUG;

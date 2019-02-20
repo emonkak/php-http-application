@@ -61,6 +61,7 @@ class ErrorLoggerTest extends TestCase
         return [
             [301, LogLevel::DEBUG],
             [404, LogLevel::DEBUG],
+            [405, LogLevel::DEBUG],
             [400, LogLevel::WARNING],
             [500, LogLevel::ERROR],
         ];
