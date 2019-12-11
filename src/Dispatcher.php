@@ -70,8 +70,10 @@ class Dispatcher implements MiddlewareInterface
                     $allowedMethods[] = 'HEAD';
                 }
 
+                $allowedMethods[] = 'OPTIONS';
+
                 return $this->responseFactory
-                    ->createResponse()
+                    ->createResponse(204)
                     ->withHeader('Allow', implode(', ', $allowedMethods));
             }
 

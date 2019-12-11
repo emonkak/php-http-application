@@ -262,13 +262,14 @@ class DispatcherTest extends TestCase
         $response
             ->expects($this->once())
             ->method('withHeader')
-            ->with($this->identicalTo('Allow'), $this->identicalTo('GET, HEAD'))
+            ->with($this->identicalTo('Allow'),  $this->identicalTo('GET, HEAD, OPTIONS'))
             ->will($this->returnSelf());
 
         $responseFactory = $this->createMock(ResponseFactoryInterface::class);
         $responseFactory
             ->expects($this->once())
             ->method('createResponse')
+            ->with($this->identicalTo(204))
             ->willReturn($response);
 
         $container = $this->createMock(ContainerInterface::class);
