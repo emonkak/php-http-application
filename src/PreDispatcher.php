@@ -5,21 +5,16 @@ declare(strict_types=1);
 namespace Emonkak\HttpMiddleware;
 
 use Emonkak\HttpException\MethodNotAllowedHttpException;
+use Emonkak\HttpException\NotFoundHttpException;
 use Emonkak\Router\RouterInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class Dispatcher implements MiddlewareInterface
+class PreDispatcher implements MiddlewareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
     /**
      * @var ResponseFactoryInterface
      */
@@ -31,16 +26,13 @@ class Dispatcher implements MiddlewareInterface
     private $router;
 
     /**
-     * @param ContainerInterface       $container
      * @param ResponseFactoryInterface $responseFactory
      * @param RouterInterface          $router
      */
     public function __construct(
-        ContainerInterface $container,
         ResponseFactoryInterface $responseFactory,
         RouterInterface $router
     ) {
-        $this->container = $container;
         $this->responseFactory = $responseFactory;
         $this->router = $router;
     }
@@ -54,7 +46,7 @@ class Dispatcher implements MiddlewareInterface
         $match = $this->router->match($path);
 
         if ($match === null) {
-            return $handler->handle($request);
+            throw new NotFoundHttpException('No route matches.');
         }
 
         list ($handlers, $params) = $match;
@@ -88,16 +80,8 @@ class Dispatcher implements MiddlewareInterface
             $request = $request->withAttribute($name, urldecode($value));
         }
 
-        if (is_array($handlerReference)) {
-            list ($class, $method) = $handlerReference;
+        $request = $request->withAttribute('__handler_reference', $handlerReference);
 
-            $instance = $this->container->get($class);
-
-            return $instance->$method($request);
-        } else {
-            $handler = $this->container->get($handlerReference);
-
-            return $handler->handle($request);
-        }
+        return $handler->handle($request);
     }
 }
