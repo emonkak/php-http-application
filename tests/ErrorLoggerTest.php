@@ -40,7 +40,7 @@ class ErrorLoggerTest extends TestCase
             ->method('log')
             ->with(
                 $expectedLogLevel,
-                'Uncaught exception',
+                'Uncaught ' . get_class($exception),
                 ['exception' => $exception]
             );
 
@@ -86,7 +86,7 @@ class ErrorLoggerTest extends TestCase
             ->method('log')
             ->with(
                 LogLevel::ERROR,
-                'Uncaught exception',
+                'Uncaught ' . get_class($exception),
                 ['exception' => $exception]
             );
 

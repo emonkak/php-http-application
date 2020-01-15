@@ -37,14 +37,14 @@ class ErrorLogger implements MiddlewareInterface
         } catch (HttpExceptionInterface $e) {
             $this->logger->log(
                 $this->getLogLevel($e),
-                'Uncaught exception',
+                'Uncaught ' . get_class($e),
                 ['exception' => $e]
             );
             throw $e;
         } catch (\Throwable $e) {
             $this->logger->log(
                 $this->getDefaultLogLevel(),
-                'Uncaught exception',
+                'Uncaught ' . get_class($e),
                 ['exception' => $e]
             );
             throw $e;
