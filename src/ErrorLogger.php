@@ -9,8 +9,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 class ErrorLogger implements MiddlewareInterface
 {
@@ -19,16 +19,13 @@ class ErrorLogger implements MiddlewareInterface
      */
     private $logger;
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -51,10 +48,6 @@ class ErrorLogger implements MiddlewareInterface
         }
     }
 
-    /**
-     * @param HttpExceptionInterface $exception
-     * @return string
-     */
     protected function getLogLevel(HttpExceptionInterface $exception): string
     {
         $statusCode = $exception->getStatusCode();
@@ -67,9 +60,6 @@ class ErrorLogger implements MiddlewareInterface
         }
     }
 
-    /**
-     * @return string
-     */
     protected function getDefaultLogLevel(): string
     {
         return LogLevel::ERROR;

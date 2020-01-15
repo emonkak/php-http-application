@@ -11,7 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 
 /**
- * @covers Emonkak\HttpMiddleware\Pipeline
+ * @covers \Emonkak\HttpMiddleware\Pipeline
  */
 class PipelineTest extends TestCase
 {
@@ -60,7 +60,7 @@ class PipelineTest extends TestCase
     }
 
     /**
-     * @expectedException Emonkak\HttpException\NotFoundHttpException
+     * @expectedException \Emonkak\HttpException\NotFoundHttpException
      */
     public function testProcessThrowsHttpExceptionInterface()
     {

@@ -7,7 +7,6 @@ namespace Emonkak\HttpMiddleware\Tests\Middleware;
 use Emonkak\HttpMiddleware\PreDispatcher;
 use Emonkak\Router\RouterInterface;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -15,12 +14,12 @@ use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * @covers Emonkak\HttpMiddleware\PreDispatcher
+ * @covers \Emonkak\HttpMiddleware\PreDispatcher
  */
 class PreDispatcherTest extends TestCase
 {
     /**
-     * @expectedException Emonkak\HttpException\NotFoundHttpException
+     * @expectedException \Emonkak\HttpException\NotFoundHttpException
      */
     public function testNotMatched()
     {
@@ -87,7 +86,7 @@ class PreDispatcherTest extends TestCase
             ->with($path)
             ->willReturn([
                 ['HEAD' => DispatcherTestMiddleware::class],
-                ['foo_id' => '123', 'bar_id' => '456']
+                ['foo_id' => '123', 'bar_id' => '456'],
             ]);
 
         $dispatcher = new PreDispatcher($responseFactory, $router);
@@ -130,7 +129,7 @@ class PreDispatcherTest extends TestCase
             ->with($path)
             ->willReturn([
                 ['GET' => DispatcherTestMiddleware::class],
-                ['foo_id' => '123', 'bar_id' => '456']
+                ['foo_id' => '123', 'bar_id' => '456'],
             ]);
 
         $dispatcher = new PreDispatcher($responseFactory, $router);
@@ -155,7 +154,7 @@ class PreDispatcherTest extends TestCase
         $response
             ->expects($this->once())
             ->method('withHeader')
-            ->with($this->identicalTo('Allow'),  $this->identicalTo('GET, HEAD, OPTIONS'))
+            ->with($this->identicalTo('Allow'), $this->identicalTo('GET, HEAD, OPTIONS'))
             ->will($this->returnSelf());
 
         $responseFactory = $this->createMock(ResponseFactoryInterface::class);
@@ -172,7 +171,7 @@ class PreDispatcherTest extends TestCase
             ->with($path)
             ->willReturn([
                 ['GET' => DispatcherTestMiddleware::class],
-                ['foo_id' => '123', 'bar_id' => '456']
+                ['foo_id' => '123', 'bar_id' => '456'],
             ]);
 
         $dispatcher = new PreDispatcher($responseFactory, $router);
@@ -181,7 +180,7 @@ class PreDispatcherTest extends TestCase
     }
 
     /**
-     * @expectedException Emonkak\HttpException\MethodNotAllowedHttpException
+     * @expectedException \Emonkak\HttpException\MethodNotAllowedHttpException
      */
     public function testMethodNotAllowed()
     {
@@ -208,7 +207,7 @@ class PreDispatcherTest extends TestCase
             ->with($path)
             ->willReturn([
                 ['GET' => DispatcherTestMiddleware::class],
-                ['foo_id' => 123, 'bar_id' => 456]
+                ['foo_id' => 123, 'bar_id' => 456],
             ]);
 
         $dispatcher = new PreDispatcher($responseFactory, $router);

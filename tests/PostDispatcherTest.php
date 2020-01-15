@@ -12,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * @covers Emonkak\HttpMiddleware\PostDispatcher
+ * @covers \Emonkak\HttpMiddleware\PostDispatcher
  */
 class PostDispatcherTest extends TestCase
 {

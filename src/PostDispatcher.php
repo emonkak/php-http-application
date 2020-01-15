@@ -17,9 +17,6 @@ class PostDispatcher implements MiddlewareInterface
      */
     private $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(
         ContainerInterface $container
     ) {
@@ -27,14 +24,14 @@ class PostDispatcher implements MiddlewareInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $handlerReference = $request->getAttribute('__handler_reference');
 
         if (is_array($handlerReference)) {
-            list ($class, $method) = $handlerReference;
+            list($class, $method) = $handlerReference;
 
             $instance = $this->container->get($class);
 

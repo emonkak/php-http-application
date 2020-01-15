@@ -4,18 +4,15 @@ declare(strict_types=1);
 
 namespace Emonkak\HttpMiddleware\Tests;
 
-use Emonkak\HttpException\HttpException;
-use Emonkak\HttpException\InternalServerErrorHttpException;
 use Emonkak\HttpMiddleware\Application;
 use Emonkak\HttpMiddleware\Pipeline;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\MiddlewareInterface;
 
 /**
- * @covers Emonkak\HttpMiddleware\Application
+ * @covers \Emonkak\HttpMiddleware\Application
  */
 class ApplicationTest extends TestCase
 {

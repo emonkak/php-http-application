@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\HttpMiddleware;
 
 use Psr\Http\Message\ResponseInterface;
@@ -14,10 +16,6 @@ class Application implements RequestHandlerInterface
      */
     private $middlewares = [];
 
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $pipeline = new Pipeline($this->middlewares);
@@ -25,7 +23,6 @@ class Application implements RequestHandlerInterface
     }
 
     /**
-     * @param MiddlewareInterface $middleware
      * @return $this
      */
     public function pipe(MiddlewareInterface $middleware): Application

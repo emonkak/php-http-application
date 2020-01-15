@@ -12,7 +12,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * @covers Emonkak\HttpMiddleware\PredicateDecorator
+ * @covers \Emonkak\HttpMiddleware\PredicateDecorator
  */
 class PredicateDecoratorTest extends TestCase
 {
