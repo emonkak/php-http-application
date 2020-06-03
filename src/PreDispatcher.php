@@ -25,10 +25,6 @@ class PreDispatcher implements MiddlewareInterface
      */
     private $router;
 
-    /**
-     * @param ResponseFactoryInterface $responseFactory
-     * @param RouterInterface          $router
-     */
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         RouterInterface $router
@@ -38,7 +34,7 @@ class PreDispatcher implements MiddlewareInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -49,7 +45,7 @@ class PreDispatcher implements MiddlewareInterface
             throw new NotFoundHttpException('No route matches.');
         }
 
-        list ($handlers, $params) = $match;
+        list($handlers, $params) = $match;
         $method = strtoupper($request->getMethod());
 
         if (isset($handlers[$method])) {

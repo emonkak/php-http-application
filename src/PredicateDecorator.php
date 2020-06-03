@@ -21,10 +21,6 @@ class PredicateDecorator implements MiddlewareInterface
      */
     private $predicate;
 
-    /**
-     * @param MiddlewareInterface $middleware
-     * @param callable            $predicate
-     */
     public function __construct(MiddlewareInterface $middleware, callable $predicate)
     {
         $this->middleware = $middleware;
@@ -32,7 +28,7 @@ class PredicateDecorator implements MiddlewareInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

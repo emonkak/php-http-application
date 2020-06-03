@@ -7,14 +7,13 @@ namespace Emonkak\HttpMiddleware\Tests;
 use Emonkak\HttpException\HttpException;
 use Emonkak\HttpMiddleware\ErrorLogger;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
- * @covers Emonkak\HttpMiddleware\ErrorLogger
+ * @covers \Emonkak\HttpMiddleware\ErrorLogger
  */
 class ErrorLoggerTest extends TestCase
 {
