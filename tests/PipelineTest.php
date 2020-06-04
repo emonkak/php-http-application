@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Emonkak\HttpMiddleware\Tests;
+namespace Emonkak\HttpApplication\Tests;
 
-use Emonkak\HttpMiddleware\Pipeline;
+use Emonkak\HttpApplication\Pipeline;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 
 /**
- * @covers \Emonkak\HttpMiddleware\Pipeline
+ * @covers \Emonkak\HttpApplication\Pipeline
  */
 class PipelineTest extends TestCase
 {

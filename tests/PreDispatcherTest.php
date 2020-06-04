@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Emonkak\HttpMiddleware\Tests\Middleware;
+namespace Emonkak\HttpApplication\Tests\Middleware;
 
-use Emonkak\HttpMiddleware\PreDispatcher;
+use Emonkak\HttpApplication\PreDispatcher;
 use Emonkak\Router\RouterInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -14,7 +14,7 @@ use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * @covers \Emonkak\HttpMiddleware\PreDispatcher
+ * @covers \Emonkak\HttpApplication\PreDispatcher
  */
 class PreDispatcherTest extends TestCase
 {

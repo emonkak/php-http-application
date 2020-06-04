@@ -1,6 +1,6 @@
 {
-    "name": "emonkak/http-middleware",
-    "description": "A library for web framework building that uses HTTP Middleware",
+    "name": "emonkak/http-application",
+    "description": "A http application for PSR-15 http server request handlers",
     "license": "MIT",
     "authors": [
         {
@@ -27,12 +27,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Emonkak\\HttpMiddleware\\": "src/"
+            "Emonkak\\HttpApplication\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Emonkak\\HttpMiddleware\\Tests\\": "tests/"
+            "Emonkak\\HttpApplication\\Tests\\": "tests/"
         }
     }
 }

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Emonkak\HttpMiddleware\Tests;
+namespace Emonkak\HttpApplication\Tests;
 
-use Emonkak\HttpMiddleware\PredicateDecorator;
+use Emonkak\HttpApplication\PredicateDecorator;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -12,7 +12,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * @covers \Emonkak\HttpMiddleware\PredicateDecorator
+ * @covers \Emonkak\HttpApplication\PredicateDecorator
  */
 class PredicateDecoratorTest extends TestCase
 {

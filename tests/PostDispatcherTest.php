@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Emonkak\HttpMiddleware\Tests\Middleware;
+namespace Emonkak\HttpApplication\Tests\Middleware;
 
-use Emonkak\HttpMiddleware\PostDispatcher;
+use Emonkak\HttpApplication\PostDispatcher;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -12,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * @covers \Emonkak\HttpMiddleware\PostDispatcher
+ * @covers \Emonkak\HttpApplication\PostDispatcher
  */
 class PostDispatcherTest extends TestCase
 {

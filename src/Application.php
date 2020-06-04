@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Emonkak\HttpMiddleware;
+namespace Emonkak\HttpApplication;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

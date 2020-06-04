@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Emonkak\HttpMiddleware;
+namespace Emonkak\HttpApplication;
 
 use Emonkak\HttpException\MethodNotAllowedHttpException;
 use Emonkak\HttpException\NotFoundHttpException;

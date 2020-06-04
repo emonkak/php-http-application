@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Emonkak\HttpMiddleware\Tests;
+namespace Emonkak\HttpApplication\Tests;
 
+use Emonkak\HttpApplication\ErrorLogger;
 use Emonkak\HttpException\HttpException;
-use Emonkak\HttpMiddleware\ErrorLogger;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
- * @covers \Emonkak\HttpMiddleware\ErrorLogger
+ * @covers \Emonkak\HttpApplication\ErrorLogger
  */
 class ErrorLoggerTest extends TestCase
 {
