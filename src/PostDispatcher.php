@@ -29,6 +29,9 @@ class PostDispatcher implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $handlerReference = $request->getAttribute('__handler_reference');
+        if ($handlerReference === null) {
+            throw new \RuntimeException('The handler reference is not defined. You need to call `PreDispatcher` before execution of `PostDispatcher`.');
+        }
 
         if (is_array($handlerReference)) {
             list($class, $method) = $handlerReference;

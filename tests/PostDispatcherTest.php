@@ -16,6 +16,32 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 class PostDispatcherTest extends TestCase
 {
+    public function testHandlerReferenceNotDefinied(): void
+    {
+        $this->expectException(\RuntimeException::class);
+
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request
+            ->expects($this->once())
+            ->method('getAttribute')
+            ->with('__handler_reference')
+            ->willReturn(null);
+
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler
+            ->expects($this->never())
+            ->method('handle');
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->never())
+            ->method('get');
+
+        $dispatcher = new PostDispatcher($container);
+
+        $dispatcher->process($request, $handler);
+    }
+
     public function testControllerMatched()
     {
         $request = $this->createMock(ServerRequestInterface::class);
